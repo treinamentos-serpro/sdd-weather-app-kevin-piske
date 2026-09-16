@@ -181,6 +181,28 @@ describe('weather services', () => {
       expect(missingField).toBeTruthy();
     });
 
+    it.each(['', '2026-09-16 14:00', 'invalid'])(
+      'rejects current data with invalid local time %s',
+      async (time) => {
+        vi.stubGlobal(
+          'fetch',
+          vi.fn().mockResolvedValue(
+            mockJsonResponse({
+              current: { time, temperature_2m: 20, weather_code: 2 },
+              daily: {
+                time: ['1', '2', '3', '4', '5'],
+                temperature_2m_min: [1, 1, 1, 1, 1],
+                temperature_2m_max: [2, 2, 2, 2, 2],
+                weather_code: [0, 0, 0, 0, 0],
+              },
+            }),
+          ),
+        );
+
+        await expect(getWeather(city)).rejects.toBeInstanceOf(WeatherServiceError);
+      },
+    );
+
     it('rejects daily arrays with incompatible lengths', async () => {
       vi.stubGlobal(
         'fetch',

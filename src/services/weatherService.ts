@@ -5,6 +5,7 @@ const FORECAST_ENDPOINT = 'https://api.open-meteo.com/v1/forecast';
 const REQUEST_TIMEOUT_MS = 10_000;
 const FORECAST_DAY_MS = 24 * 60 * 60 * 1000;
 const FORECAST_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const LOCAL_ISO_DATETIME_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 
 interface GeocodingResult {
   id?: number | null;
@@ -99,6 +100,14 @@ function hasValidForecastDates(dates: Array<string | null>): boolean {
   }
 
   return true;
+}
+
+function isValidLocalIsoDateTime(value: string | null | undefined): value is string {
+  if (typeof value !== 'string' || !LOCAL_ISO_DATETIME_PATTERN.test(value)) {
+    return false;
+  }
+
+  return !Number.isNaN(new Date(value).getTime());
 }
 
 async function readJson<T>(response: Response): Promise<T> {
@@ -238,7 +247,7 @@ export async function getWeather(city: City): Promise<WeatherData> {
   }
 
   const hasValidCurrent =
-    typeof current.time === 'string' &&
+    isValidLocalIsoDateTime(current.time) &&
     finiteOrUndefined(current.temperature_2m) !== undefined &&
     finiteOrUndefined(current.weather_code) !== undefined;
   const hasValidDailyValues =
