@@ -5,31 +5,28 @@ interface UnitToggleProps {
   onChange: (unit: Unit) => void;
 }
 
-/** Alternador de unidade Celsius/Fahrenheit, acessível por teclado. */
 export default function UnitToggle({ unit, onChange }: UnitToggleProps) {
   return (
     <div
-      role="group"
       aria-label="Unidade de temperatura"
-      className="inline-flex rounded-lg border border-white/10 bg-white/5 p-1 backdrop-blur-md"
+      className="inline-flex w-fit rounded-xl border border-white/10 bg-white/5 p-1 shadow-glass backdrop-blur-md"
+      role="group"
     >
       <button
-        type="button"
+        aria-label="Usar graus Celsius"
         aria-pressed={unit === 'celsius'}
+        className="min-h-10 min-w-14 rounded-lg px-3 py-2 text-sm font-semibold text-white outline-none transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-accent-400 aria-pressed:bg-accent-500 aria-pressed:hover:bg-accent-400"
         onClick={() => onChange('celsius')}
-        className={`rounded-md px-3 py-1 text-sm font-semibold transition ${
-          unit === 'celsius' ? 'bg-accent-500 text-white' : 'text-white/60 hover:text-white'
-        }`}
+        type="button"
       >
         °C
       </button>
       <button
-        type="button"
+        aria-label="Usar graus Fahrenheit"
         aria-pressed={unit === 'fahrenheit'}
+        className="min-h-10 min-w-14 rounded-lg px-3 py-2 text-sm font-semibold text-white outline-none transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-accent-400 aria-pressed:bg-accent-500 aria-pressed:hover:bg-accent-400"
         onClick={() => onChange('fahrenheit')}
-        className={`rounded-md px-3 py-1 text-sm font-semibold transition ${
-          unit === 'fahrenheit' ? 'bg-accent-500 text-white' : 'text-white/60 hover:text-white'
-        }`}
+        type="button"
       >
         °F
       </button>
