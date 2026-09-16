@@ -53,11 +53,11 @@ test('busca uma cidade, exibe a previsão e converte a temperatura', async ({ pa
 
   await expect(page.getByRole('heading', { name: 'Curitiba' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Previsão para 5 dias' })).toBeVisible();
-  await expect(page.getByText('0°C')).toBeVisible();
+  await expect(page.getByText('0°C', { exact: true })).toBeVisible();
 
   await page.getByRole('button', { name: 'Usar graus Fahrenheit' }).click();
 
-  await expect(page.getByText('32°F')).toBeVisible();
+  await expect(page.getByText('32°F', { exact: true })).toBeVisible();
 });
 
 test('mostra mensagem quando o geocoding não retorna results', async ({ page }) => {
