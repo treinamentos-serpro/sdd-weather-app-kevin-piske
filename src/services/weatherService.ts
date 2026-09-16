@@ -119,8 +119,14 @@ export async function searchCities(name: string): Promise<City[]> {
       } =>
         typeof result.id === 'number' &&
         typeof result.name === 'string' &&
+        typeof result.latitude === 'number' &&
         Number.isFinite(result.latitude) &&
+        result.latitude >= -90 &&
+        result.latitude <= 90 &&
+        typeof result.longitude === 'number' &&
         Number.isFinite(result.longitude) &&
+        result.longitude >= -180 &&
+        result.longitude <= 180 &&
         typeof result.country === 'string',
     )
     .map((result) => ({
