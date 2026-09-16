@@ -86,4 +86,10 @@ describe('unit conversion in weather presentation', () => {
       'true',
     );
   });
+
+  it('shows the current date and time formatted in pt-BR for the city timezone', () => {
+    render(<CurrentWeather city={city} current={current} unit="celsius" />);
+
+    expect(screen.getByText(/16\/09\/2026,?\s14:00/)).toBeInTheDocument();
+  });
 });

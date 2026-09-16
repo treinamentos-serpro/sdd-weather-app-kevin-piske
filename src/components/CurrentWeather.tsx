@@ -1,3 +1,4 @@
+import { formatLocalDateTime } from '../lib/format';
 import { formatTemperature } from '../lib/temperature';
 import { getWeatherCondition } from '../lib/weatherCodes';
 import type { City, CurrentWeather as CurrentWeatherData, Unit } from '../types/weather';
@@ -56,7 +57,9 @@ export default function CurrentWeather({ city, current, unit }: CurrentWeatherPr
           <p className="mt-1 break-words text-sm text-white/80">
             {[city.region, city.country].filter(Boolean).join(', ')}
           </p>
-          <p className="mt-4 text-sm text-white/80">{current.time.replace('T', ' ')}</p>
+          <p className="mt-4 text-sm text-white/80">
+            {formatLocalDateTime(current.time, city.timezone ?? 'UTC')}
+          </p>
         </div>
 
         <div className="flex items-center gap-4">
