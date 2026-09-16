@@ -200,7 +200,7 @@ export async function getWeather(city: City): Promise<WeatherData> {
     apparentTemperatureCelsius: finiteOrUndefined(current.apparent_temperature),
     relativeHumidity: finiteOrUndefined(current.relative_humidity_2m),
     windSpeedKmh: finiteOrUndefined(current.wind_speed_10m),
-    precipitationMm: finiteOrUndefined(current.precipitation) ?? 0,
+    precipitationMm: finiteOrUndefined(current.precipitation),
     pressureHpa: finiteOrUndefined(current.pressure_msl),
     weatherCode: finiteOrUndefined(current.weather_code) as number,
   };
