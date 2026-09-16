@@ -72,8 +72,16 @@ describe('useWeather error recovery', () => {
       await result.current.retry();
     });
 
-    await waitFor(() => expect(result.current.status).toBe('success'));
+    await waitFor(() => expect(result.current.status).toBe('selection'));
     expect(searchCitiesMock).toHaveBeenCalledTimes(2);
+    expect(result.current.cities).toEqual([city]);
+    expect(getWeatherMock).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.selectCity(city);
+    });
+
+    await waitFor(() => expect(result.current.status).toBe('success'));
     expect(getWeatherMock).toHaveBeenCalledWith(city);
   });
 
@@ -88,6 +96,13 @@ describe('useWeather error recovery', () => {
       await result.current.search('Curitiba');
     });
 
+    expect(result.current.status).toBe('selection');
+    expect(getWeatherMock).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.selectCity(city);
+    });
+
     expect(result.current.status).toBe('error');
 
     await act(async () => {
@@ -97,5 +112,19 @@ describe('useWeather error recovery', () => {
     await waitFor(() => expect(result.current.status).toBe('success'));
     expect(searchCitiesMock).toHaveBeenCalledOnce();
     expect(getWeatherMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps the geocoding results available for explicit selection', async () => {
+    searchCitiesMock.mockResolvedValue([city]);
+
+    const { result } = renderHook(() => useWeather());
+
+    await act(async () => {
+      await result.current.search('Curitiba');
+    });
+
+    expect(result.current.status).toBe('selection');
+    expect(result.current.cities).toEqual([city]);
+    expect(getWeatherMock).not.toHaveBeenCalled();
   });
 });

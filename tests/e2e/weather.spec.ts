@@ -9,6 +9,16 @@ test('busca uma cidade, exibe a previsão e converte a temperatura', async ({ pa
           {
             id: 1,
             name: 'Curitiba',
+            latitude: -26.92,
+            longitude: -49.07,
+            country: 'Brasil',
+            country_code: 'BR',
+            admin1: 'Santa Catarina',
+            timezone: 'America/Sao_Paulo',
+          },
+          {
+            id: 2,
+            name: 'Curitiba',
             latitude: -25.43,
             longitude: -49.27,
             country: 'Brasil',
@@ -50,14 +60,19 @@ test('busca uma cidade, exibe a previsão e converte a temperatura', async ({ pa
   await page.goto('/');
   await page.getByLabel('Cidade').fill('Curitiba');
   await page.getByRole('button', { name: 'Buscar' }).click();
+  await page.getByRole('button', { name: 'Curitiba Paraná, Brasil' }).click();
+
+  const currentWeatherSection = page.locator('section').filter({
+    has: page.getByRole('heading', { name: 'Curitiba' }),
+  });
 
   await expect(page.getByRole('heading', { name: 'Curitiba' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Previsão para 5 dias' })).toBeVisible();
-  await expect(page.getByText('0°C', { exact: true })).toBeVisible();
+  await expect(currentWeatherSection.locator('p').filter({ hasText: '0°C' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Usar graus Fahrenheit' }).click();
 
-  await expect(page.getByText('32°F', { exact: true })).toBeVisible();
+  await expect(currentWeatherSection.locator('p').filter({ hasText: '32°F' })).toBeVisible();
 });
 
 test('mostra mensagem quando o geocoding não retorna results', async ({ page }) => {
@@ -113,6 +128,7 @@ test('mostra erro quando o forecast está incompleto', async ({ page }) => {
   await page.goto('/');
   await page.getByLabel('Cidade').fill('Manaus');
   await page.getByRole('button', { name: 'Buscar' }).click();
+  await page.getByRole('button', { name: 'Manaus Amazonas, Brasil' }).click();
 
   await expect(page.getByRole('alert')).toContainText('Os dados do clima vieram incompletos.');
   await expect(page.getByRole('button', { name: 'Tentar novamente' })).toBeVisible();
@@ -171,6 +187,7 @@ test.describe('fluxo principal mobile', () => {
     await page.goto('/');
     await page.getByLabel('Cidade').fill('Recife');
     await page.getByRole('button', { name: 'Buscar' }).click();
+    await page.getByRole('button', { name: 'Recife Pernambuco, Brasil' }).click();
 
     await expect(page.getByRole('heading', { name: 'Recife' })).toBeVisible();
     await expect(page.getByText('28°C')).toBeVisible();

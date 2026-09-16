@@ -10,7 +10,7 @@ import { useWeather } from './hooks/useWeather';
 import type { Unit } from './types/weather';
 
 export default function App() {
-  const { data, error, retry, search, status } = useWeather();
+  const { cities, data, error, retry, search, selectCity, status } = useWeather();
   const [unit, setUnit] = useState<Unit>('celsius');
   const mainRef = useRef<HTMLElement>(null);
 
@@ -28,6 +28,35 @@ export default function App() {
         return <EmptyState hint="Tente buscar outra cidade ou confira a grafia informada." />;
       case 'error':
         return <ErrorState message={error ?? undefined} onRetry={retry} />;
+      case 'selection':
+        return (
+          <section className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6 shadow-glass backdrop-blur-md">
+            <div className="space-y-1">
+              <h2 className="text-xl font-semibold text-white">Selecione uma localidade</h2>
+              <p className="text-sm text-white/80">
+                Escolha a cidade correta para carregar a previsão correspondente.
+              </p>
+            </div>
+            <ul className="space-y-3">
+              {cities.map((city) => (
+                <li key={city.id}>
+                  <button
+                    className="flex w-full items-center justify-between gap-3 rounded-2xl border border-white/10 bg-night-800/70 px-4 py-3 text-left transition hover:border-accent-400 hover:bg-night-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400"
+                    onClick={() => void selectCity(city)}
+                    type="button"
+                  >
+                    <span className="min-w-0">
+                      <span className="block font-semibold text-white">{city.name}</span>
+                      <span className="block text-sm text-white/75">
+                        {[city.region, city.country].filter(Boolean).join(', ')}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
       case 'success':
         if (!data) {
           return <ErrorState onRetry={retry} />;
