@@ -111,6 +111,15 @@ describe('weather services', () => {
       await expect(searchCities('Atlantis')).resolves.toEqual([]);
     });
 
+    it('throws WeatherServiceError when geocoding returns JSON null', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(null)));
+
+      await expect(searchCities('São Paulo')).rejects.toMatchObject({
+        name: 'WeatherServiceError',
+        message: 'Não foi possível interpretar a resposta do serviço.',
+      });
+    });
+
     it('throws WeatherServiceError for a non-ok geocoding response', async () => {
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse({}, false, 503)));
 

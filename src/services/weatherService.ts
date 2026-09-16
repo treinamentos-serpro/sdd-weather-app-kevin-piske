@@ -157,7 +157,11 @@ export async function searchCities(name: string): Promise<City[]> {
     throw new WeatherServiceError('Não foi possível buscar cidades agora.');
   }
 
-  const payload = await readJson<GeocodingResponse>(response);
+  const payload = await readJson<GeocodingResponse | null>(response);
+
+  if (!payload || typeof payload !== 'object') {
+    throw new WeatherServiceError('Não foi possível interpretar a resposta do serviço.');
+  }
 
   return (Array.isArray(payload.results) ? payload.results : [])
     .filter(
