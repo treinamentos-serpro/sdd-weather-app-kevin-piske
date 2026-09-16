@@ -3,6 +3,8 @@ import type { City, CurrentWeather, ForecastDay, WeatherData } from '../types/we
 const GEOCODING_ENDPOINT = 'https://geocoding-api.open-meteo.com/v1/search';
 const FORECAST_ENDPOINT = 'https://api.open-meteo.com/v1/forecast';
 const REQUEST_TIMEOUT_MS = 10_000;
+const FORECAST_DAY_MS = 24 * 60 * 60 * 1000;
+const FORECAST_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 interface GeocodingResult {
   id?: number | null;
@@ -46,6 +48,57 @@ interface ForecastResponse {
 
 function finiteOrUndefined(value: number | null | undefined): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function parseForecastDate(value: string): number | undefined {
+  if (!FORECAST_DATE_PATTERN.test(value)) {
+    return undefined;
+  }
+
+  const [year, month, day] = value.split('-').map(Number);
+  const timestamp = Date.UTC(year, month - 1, day);
+  const date = new Date(timestamp);
+
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    return undefined;
+  }
+
+  return timestamp;
+}
+
+function hasValidForecastDates(dates: Array<string | null>): boolean {
+  const seenDates = new Set<string>();
+  let previousTimestamp: number | undefined;
+
+  for (const date of dates) {
+    if (typeof date !== 'string') {
+      return false;
+    }
+
+    if (seenDates.has(date)) {
+      return false;
+    }
+
+    seenDates.add(date);
+
+    const timestamp = parseForecastDate(date);
+
+    if (timestamp === undefined) {
+      return false;
+    }
+
+    if (previousTimestamp !== undefined && timestamp - previousTimestamp !== FORECAST_DAY_MS) {
+      return false;
+    }
+
+    previousTimestamp = timestamp;
+  }
+
+  return true;
 }
 
 async function readJson<T>(response: Response): Promise<T> {
@@ -186,6 +239,7 @@ export async function getWeather(city: City): Promise<WeatherData> {
     finiteOrUndefined(current.weather_code) !== undefined;
   const hasValidDailyValues =
     dates.every((date) => typeof date === 'string') &&
+    hasValidForecastDates(dates) &&
     minimumTemperatures.every((temperature) => finiteOrUndefined(temperature) !== undefined) &&
     maximumTemperatures.every((temperature) => finiteOrUndefined(temperature) !== undefined) &&
     weatherCodes.every((weatherCode) => finiteOrUndefined(weatherCode) !== undefined);

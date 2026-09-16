@@ -278,6 +278,34 @@ describe('weather services', () => {
       );
     });
 
+    it.each([
+      ['formato inválido', ['2026-09-16', '2026-09-17', '2026-09-18T00:00', '2026-09-19', '2026-09-20']],
+      ['data duplicada', ['2026-09-16', '2026-09-17', '2026-09-17', '2026-09-19', '2026-09-20']],
+      ['fora de ordem', ['2026-09-16', '2026-09-18', '2026-09-17', '2026-09-19', '2026-09-20']],
+      ['com lacuna', ['2026-09-16', '2026-09-17', '2026-09-19', '2026-09-20', '2026-09-21']],
+    ])('rejects forecast dates with %s', async (_scenario, dates) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue(
+          mockJsonResponse({
+            current: {
+              time: '2026-09-16T14:00',
+              temperature_2m: 20,
+              weather_code: 0,
+            },
+            daily: {
+              time: dates,
+              temperature_2m_min: [16, 17, 18, 18, 17],
+              temperature_2m_max: [25, 25, 26, 24, 24],
+              weather_code: [2, 3, 61, 3, 1],
+            },
+          }),
+        ),
+      );
+
+      await expect(getWeather(city)).rejects.toBeInstanceOf(WeatherServiceError);
+    });
+
     it('maps null precipitation to zero', async () => {
       vi.stubGlobal(
         'fetch',
