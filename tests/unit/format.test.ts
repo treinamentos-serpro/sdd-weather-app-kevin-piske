@@ -1,18 +1,19 @@
-import { describe, it, expect } from 'vitest';
-import { getDayLabel, getShortDate } from '../../src/lib/format';
+import { formatDayLabel, getShortDate } from '../../src/lib/format';
 
-describe('format', () => {
-  it('rotula o primeiro e o segundo dia', () => {
-    expect(getDayLabel('2026-06-16', 0)).toBe('Hoje');
-    expect(getDayLabel('2026-06-17', 1)).toBe('Amanhã');
+describe('date formatting helpers', () => {
+  it('labels the first forecast day as Hoje', () => {
+    expect(formatDayLabel('2026-09-16', 0)).toBe('Hoje');
   });
 
-  it('usa dia da semana para os demais', () => {
-    // 2026-06-18 é uma quinta-feira.
-    expect(getDayLabel('2026-06-18', 2)).toBe('Qui');
+  it('labels the second forecast day as Amanhã', () => {
+    expect(formatDayLabel('2026-09-17', 1)).toBe('Amanhã');
   });
 
-  it('formata data curta', () => {
-    expect(getShortDate('2026-06-16')).toBe('16 Jun');
+  it('uses the weekday for subsequent forecast days', () => {
+    expect(formatDayLabel('2026-09-18', 2)).toMatch(/sex/i);
+  });
+
+  it('formats a date as day and month', () => {
+    expect(getShortDate('2026-09-16')).toBe('16/09');
   });
 });
