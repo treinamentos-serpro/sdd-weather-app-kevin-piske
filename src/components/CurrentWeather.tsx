@@ -35,6 +35,7 @@ function Metric({ label, value }: MetricProps) {
 export default function CurrentWeather({ city, current, unit }: CurrentWeatherProps) {
   const condition = getWeatherCondition(current.weatherCode);
   const metrics = [
+    { label: 'Sensação térmica', value: formatTemperature(current.apparentTemperatureCelsius ?? Number.NaN, unit) },
     { label: 'Umidade', value: formatMetric(current.relativeHumidity, '%') },
     { label: 'Vento', value: formatMetric(current.windSpeedKmh, ' km/h') },
     { label: 'Precipitação', value: formatPrecipitation(current.precipitationMm) },
